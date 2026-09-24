@@ -10,6 +10,7 @@ import { Button } from '../ui/button'
 import api from '../../api/axios'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
+import { X } from 'lucide-react'
 
 const budgetSchema = z.object({
     total: z.coerce.number().min(1, "Must be atleast 1 characters"),
@@ -206,6 +207,7 @@ const TripForm = () => {
                       {
                         fields.map((item, index)=>{
                           return (
+                            <div className='flex items-end gap-2'>
                                <Controller
                   name= {`destinations.${index}`}
                   control={form.control} 
@@ -223,6 +225,8 @@ const TripForm = () => {
                     </Field>
                   )} 
                   />
+                  <Button type="button" varient="outline" onClick={() => remove}>< X /> </Button>
+                  </div>
                           )
                         })
                       }

@@ -5,10 +5,20 @@ import { EllipsisVertical, Plus } from 'lucide-react'
 import api from '../../api/axios'
 import { toast } from 'sonner'
 import { formatDate } from '../../lib/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const Trip = () => {
 
 const [trips, setTrips] = useState([]);
+const [dependancy, setDependancy] =useState(0);
 
 useEffect(()=>{
   const fetchTrips = async ()=>{
@@ -22,8 +32,23 @@ useEffect(()=>{
   }
 
   fetchTrips(); 
-}, [])
+}, [dependancy])
 
+const onDelete = async (tripId) => {
+  try{
+    const response = await api.delete(`/trips/${tripId}`);
+
+    if(response.status === 200){
+      toast.success("Trip deleted successfully!!");
+      setDependancy(dependancy + 1);
+         }else{
+         toast.error("Error while deleting trip.");
+         }
+   }catch(error){
+      toast.error(error.message || "Error while creating trip.");
+      console.log(error);
+    }
+}
   return (
     <div className='px-20 py-24'>
       <Card>
@@ -51,7 +76,20 @@ useEffect(()=>{
                 <CardTitle>{trip.title}</CardTitle>
                 <CardDescription>{formatDate(trip.startDate)} - {formatDate(trip.endDate)}</CardDescription>
                 <CardAction>
-                <EllipsisVertical />
+               <DropdownMenu>
+                <DropdownMenuTrigger render={<Button variant="outline" />}>
+                   <EllipsisVertical />
+                     </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuGroup>
+                           <DropdownMenuLabel>Manage Trip</DropdownMenuLabel>
+                          <DropdownMenuItem><a className='w-full' href={`/trips/${trip._id}`}>View</a></DropdownMenuItem>
+                         <DropdownMenuItem><a className='w-full' href={`/trips/edit/${trip._id}`}>Edit</a></DropdownMenuItem>
+                         <DropdownMenuItem onClick={()=>{onDelete(trip._id)}}>Delete</DropdownMenuItem>
+
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </CardAction>
               </CardHeader>
               <CardContent>
@@ -69,6 +107,9 @@ useEffect(()=>{
             
           </div>
         </CardContent>
+        <CardFooter>
+          <p className='text-gray-600'>Total trips:</p>
+        </CardFooter>
       </Card>
     </div>
   )
